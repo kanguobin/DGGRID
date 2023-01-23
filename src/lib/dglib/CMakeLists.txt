@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.9)
 
-add_library(dglib
+add_library(dglib SHARED
   lib/DgAddressBase.cpp
   lib/DgApSeq.cpp
   lib/DgBase.cpp
@@ -106,5 +106,5 @@ endif()
 # If GDAL isn't present than ${GDAL_INCLUDE_DIRS} and ${GDAL_LIBRARIES} give
 # empty strings
 target_include_directories(dglib PUBLIC include ${GDAL_INCLUDE_DIRS})
-target_link_libraries(dglib PRIVATE ${GDAL_LIBRARIES} shapelib proj4lib)
-target_compile_features(dglib PRIVATE cxx_std_11)
+target_link_libraries(dglib PUBLIC ${GDAL_LIBRARIES} shapelib proj4lib)
+target_compile_features(dglib PUBLIC cxx_std_11)

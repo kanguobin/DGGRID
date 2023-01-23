@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.9)
 
-add_library(proj4lib
+add_library(proj4lib SHARED
   lib/adjlon.cpp
   lib/pj_auth.cpp
   lib/pj_mlfn.cpp
