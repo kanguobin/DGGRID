@@ -28,6 +28,9 @@
 using namespace std;
 
 #include <dglib/DgIDGGS4H.h>
+//#include <dglib/DgIDGGS.h>
+#include <dglib/DgBoundedIDGGS.h>
+
 
 ////////////////////////////////////////////////////////////////////////////////
 int main (int, char**)
@@ -42,34 +45,51 @@ int main (int, char**)
    // they will be deleted by the Network
    const DgGeoSphRF& geoRF = *(DgGeoSphRF::makeRF(net0, "GS0"));
 
-   // create the ISEA4H grid system with resolutions 0-9; requires a
+   // create the ISEA4H grid system with resolutions 0-19; requires a
    // fixed icosahedron vertex and edge azimuth
    DgGeoCoord vert0(11.25L, 58.28252559L, false); // args: lon, lat, isRadians
    long double azimuth = 0.0L;
 
    // all DGGS's must be created using a factory makeRF method
    // the DGGS is memory managed by the DgRFNetwork
-   const DgIDGGS4H* idggsPtr = DgIDGGS4H::makeRF(net0, geoRF, vert0, azimuth, 10); 
+   const DgIDGGS4H* idggsPtr = DgIDGGS4H::makeRF(net0, geoRF, vert0, azimuth, 20);
    const DgIDGGS4H& idggs = *idggsPtr;
 
-   // get the resolution 7 dgg from the dggs
-   const DgIDGG& dgg = idggs.idgg(7);
+   // get the resolution 18 dgg from the dggs
+   const DgIDGG& dgg = idggs.idgg(18);
    cout << dgg.gridStats() << endl;
-
    //////// now use the DGG /////////
 
    ///// given a point in lon/lat, get the cell it lies within /////
 
    // first create a DgLocation in geoRF coordinates
-   DgGeoCoord geoAddress(-122.7083, 42.1947, false);
-   DgLocation* thePt = geoRF.makeLocation(geoAddress);
-   cout << "the point " << *thePt << endl;
+   // DgGeoCoord geoAddress(-122.7083, 42.1947, false);
+   DgGeoCoord geoAddress(27.2460, 63.13800, false);
 
-   // converting the point location to the dgg RF determines which cell it's in
-   dgg.convert(thePt);
-   cout << "* lies in cell " << *thePt << endl;
+
+     //DgGeoCoord geoAddress(27.2460 + i/1e3 , 63.13800+i/1e3, false);
+     DgLocation* thePt = geoRF.makeLocation(geoAddress);
+     cout << "the point " << *thePt << endl;
+     // converting the point location to the dgg RF determines which cell it's in
+     dgg.convert(thePt);
+     cout << "* lies in cell " << *thePt << endl;
+
+     //seqNum address
+     DgLocation* thePt2;
+     long int sNum = dgg.bndRF().seqNum(*thePt);
+     for (long int i = 0; i < 10; i++){
+          long int cellnum = sNum + i;
+          DgQ2DICoord q2di = dgg.bndRF().addFromSeqNum(cellnum);
+          cout << "SeqNum: " << sNum << endl;
+          cout << "q2di: " << q2di << endl;
+          thePt2 = dgg.makeLocation(q2di);
+          cout << "the point lies in cell " << *thePt2 << endl;
+     }
+     delete thePt;
+     delete thePt2;
 
    // we can get the cell's vertices, which are defined in geoRF
+   /*
    DgPolygon verts;
    int ptsPerEdgeDensify = 3;
    dgg.setVertices(*thePt, verts, ptsPerEdgeDensify);
@@ -83,20 +103,20 @@ int main (int, char**)
    const DgGeoCoord& centCoord = *geoRF.getAddress(*thePt);
    double latRads = centCoord.lat();
    double lonRads = centCoord.lon();
-   cout << "* center point lon,lat in radians: " 
+   cout << "* center point lon,lat in radians: "
         << lonRads << ", " << latRads << endl;
 
    const DgGeoCoord& firstVert = *geoRF.getAddress(verts[0]);
    double latDegs = firstVert.latDegs();
    double lonDegs = firstVert.lonDegs();
-   cout << "* first boundary vertex lon,lat in degrees: " 
+   cout << "* first boundary vertex lon,lat in degrees: "
         << lonDegs << ", " << latDegs << endl;
+   */
 
-   delete thePt;
 
    return 0;
 
-} // main 
+} // main
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
